@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import java.nio.charset.StandardCharsets;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
@@ -17,13 +18,13 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);  // Move this up
+        setContentView(R.layout.activity_login);
 
-        // Initialize both database and session manager early
+        // Initialize database and session manager
         db = AppDatabase.getInstance(this);
         sessionManager = new SessionManager(this);
 
-        // Check login state after initialization
+        // Check login state
         if (sessionManager.isLoggedIn()) {
             startActivity(new Intent(this, MainActivity.class));
             finish();
@@ -50,12 +51,26 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        // Add debug logging
+        // Email validation
+        if (!isValidEmail(email)) {
+            Toast.makeText(this, "Please enter a valid email address", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Password validation
+        /*if (password.length() < 6) {
+            Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+            return;
+        }*/
+
+        // Log email for debugging
         Log.d(TAG, "Attempting login with email: " + email);
 
         new Thread(() -> {
             try {
-                User user = db.userDao().getUser(email, password);
+                // Hash the password before checking
+                String hashedPassword = hashPassword(password);
+                User user = db.userDao().getUser(email, hashedPassword);
                 runOnUiThread(() -> {
                     if (user != null) {
                         try {
@@ -79,5 +94,27 @@ public class LoginActivity extends AppCompatActivity {
                                 Toast.LENGTH_SHORT).show());
             }
         }).start();
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailPattern = "[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
+        return email != null && email.matches(emailPattern);
+    }
+
+    private String hashPassword(String password) {
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception e) {
+            Log.e(TAG, "Error hashing password: ", e);
+            return password; // Fallback to plain password if hashing fails
+        }
     }
 }
