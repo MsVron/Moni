@@ -8,11 +8,12 @@ import androidx.room.RoomDatabase;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-
-@Database(entities = {User.class}, version = 2, exportSchema = false)  // Updated version to 2
+@Database(entities = {User.class, Income.class}, version = 2, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase instance;
+
     public abstract UserDao userDao();
+    public abstract IncomeDao incomeDao();
 
     public static synchronized AppDatabase getInstance(Context context) {
         if (instance == null) {
@@ -20,7 +21,9 @@ public abstract class AppDatabase extends RoomDatabase {
                             context.getApplicationContext(),
                             AppDatabase.class,
                             "moni_db"
-                    ).addMigrations(MIGRATION_1_2)  // Added migration logic
+                    )
+                    .addMigrations(MIGRATION_1_2)  // Added migration logic
+                    .fallbackToDestructiveMigration()  // Ensures recreation if migration is not provided
                     .build();
         }
         return instance;

@@ -57,12 +57,6 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        // Password validation
-        /*if (password.length() < 6) {
-            Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
-            return;
-        }*/
-
         // Log email for debugging
         Log.d(TAG, "Attempting login with email: " + email);
 
@@ -75,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (user != null) {
                         try {
                             Log.d(TAG, "User found, setting login state");
-                            sessionManager.setLogin(true, user.getEmail(), user.getName());
+                            sessionManager.setLogin(true, user.getEmail(), user.getName(), user.getId());
                             startActivity(new Intent(this, MainActivity.class));
                             finish();
                         } catch (Exception e) {
