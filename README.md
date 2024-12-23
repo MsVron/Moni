@@ -94,4 +94,3 @@ dependencies {
 - Receipt scanning
 - Financial literacy content
 - Partnerships and offers
-```
