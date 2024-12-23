@@ -5,16 +5,19 @@
     <color name="primary_dark">#D81632</color>
     <color name="primary_light">#FF3D5C</color>
 
-    <!-- Basic Colors -->
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="grey">#CCCCCC</color>
-
-    <!-- Text Colors -->
-    <color name="text_primary">#212121</color>
-    <color name="text_secondary">#757575</color>
+    <!-- Modern UI Colors -->
+    <color name="background">#F2F2F7</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="text_primary">#000000</color>
+    <color name="text_secondary">#6E6E73</color>
+    <color name="border_color">#E5E5EA</color>
 
     <!-- Status Colors -->
-    <color name="error">#F44336</color>
-    <color name="success">#4CAF50</color>
+    <color name="success">#34C759</color>
+    <color name="warning">#FF9500</color>
+    <color name="error">#FF3B30</color>
+
+    <!-- Additional Colors -->
+    <color name="card_shadow">#1A000000</color>
+    <color name="light_gray">#F5F5F5</color>
 </resources>
