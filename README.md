@@ -69,7 +69,7 @@ app/
         ├── colors.xml
         └── strings.xml
 
-
+```
 ### Dependencies
 ```gradle
 dependencies {
