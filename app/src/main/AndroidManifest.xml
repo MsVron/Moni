@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
         <activity
+            android:name=".IncomeHistoryActivity"
+            android:exported="false" />
+        <activity
             android:name=".AddIncomeActivity"
             android:exported="false" />
         <activity

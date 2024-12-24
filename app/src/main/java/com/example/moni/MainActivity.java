@@ -42,6 +42,12 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, AddIncomeActivity.class))
         );
 
+        // Setup income history card click
+        CardView cardIncomeHistory = findViewById(R.id.cardIncomeHistory); // Ensure this ID exists in your XML
+        cardIncomeHistory.setOnClickListener(v ->
+                startActivity(new Intent(this, IncomeHistoryActivity.class))
+        );
+
         // Setup expense card click
         CardView cardExpense = findViewById(R.id.cardExpense);
         cardExpense.setOnClickListener(v ->

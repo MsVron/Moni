@@ -12,18 +12,31 @@ public class Income {
     private String type;
     private String date;
     private String description;
+    private String color;  // New field for color
+    private String currency;  // New field for currency
 
-    public Income(int userId, double amount, String type, String date, String description) {
+    // Constructor including new fields
+    public Income(int userId, double amount, String type, String date, String description, String color, String currency) {
         this.userId = userId;
         this.amount = amount;
         this.type = type;
         this.date = date;
         this.description = description;
+        this.color = color;  // Initialize color
+        this.currency = currency;  // Initialize currency
     }
 
-    // Add getter and setter for userId
+    // Getter and Setter for userId
     public int getUserId() { return userId; }
     public void setUserId(int userId) { this.userId = userId; }
+
+    // Getter and Setter for color
+    public String getColor() { return color; }
+    public void setColor(String color) { this.color = color; }
+
+    // Getter and Setter for currency
+    public String getCurrency() { return currency; }
+    public void setCurrency(String currency) { this.currency = currency; }
 
     // Existing getters and setters
     public int getId() { return id; }
