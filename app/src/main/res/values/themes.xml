@@ -6,4 +6,7 @@
     </style>
 
     <style name="Theme.Moni" parent="Base.Theme.Moni" />
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Add your customizations here -->
+    </style>
 </resources>

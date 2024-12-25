@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -19,7 +20,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:labelFor="@id/etAmount">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etAmount"
@@ -33,35 +35,45 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:labelFor="@id/spinnerCurrency">
 
         <AutoCompleteTextView
             android:id="@+id/spinnerCurrency"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
             android:hint="Select Currency"
-            android:inputType="none" />
+            android:inputType="text"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:labelFor="@id/spinnerType">
 
         <AutoCompleteTextView
             android:id="@+id/spinnerType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="false"
             android:hint="Income Type"
-            android:inputType="none" />
+            tools:ignore="SpeakableTextPresentCheck" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:labelFor="@id/etDate">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etDate"
@@ -76,7 +88,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:labelFor="@id/etDescription">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etDescription"
@@ -98,7 +111,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:scrollbars="none">
+        android:scrollbars="none"
+        tools:ignore="SpeakableTextPresentCheck">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -106,11 +120,13 @@
             android:orientation="horizontal"
             android:padding="8dp">
 
+            <!-- Color Selection Views -->
             <FrameLayout
                 android:id="@+id/colorRed"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginEnd="16dp">
+                android:layout_marginEnd="16dp"
+                android:padding="2dp">
 
                 <View
                     android:layout_width="match_parent"
@@ -119,19 +135,21 @@
 
                 <ImageView
                     android:id="@+id/checkRed"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_gravity="center"
-                    android:src="@android:drawable/ic_menu_gallery"
-                    app:tint="#FFFFFF"
-                    android:visibility="gone" />
+                    android:src="@android:drawable/ic_menu_camera"
+                    android:visibility="gone"
+                    app:tint="#FFFFFF" />
             </FrameLayout>
 
+            <!-- Blue -->
             <FrameLayout
                 android:id="@+id/colorBlue"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginEnd="16dp">
+                android:layout_marginEnd="16dp"
+                android:padding="2dp">
 
                 <View
                     android:layout_width="match_parent"
@@ -140,19 +158,21 @@
 
                 <ImageView
                     android:id="@+id/checkBlue"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_gravity="center"
-                    android:src="@android:drawable/ic_menu_gallery"
-                    app:tint="#FFFFFF"
-                    android:visibility="gone" />
+                    android:src="@android:drawable/ic_menu_camera"
+                    android:visibility="gone"
+                    app:tint="#FFFFFF" />
             </FrameLayout>
 
+            <!-- Green -->
             <FrameLayout
                 android:id="@+id/colorGreen"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginEnd="16dp">
+                android:layout_marginEnd="16dp"
+                android:padding="2dp">
 
                 <View
                     android:layout_width="match_parent"
@@ -161,19 +181,21 @@
 
                 <ImageView
                     android:id="@+id/checkGreen"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_gravity="center"
-                    android:src="@android:drawable/ic_menu_gallery"
-                    app:tint="#FFFFFF"
-                    android:visibility="gone" />
+                    android:src="@android:drawable/ic_menu_camera"
+                    android:visibility="gone"
+                    app:tint="#FFFFFF" />
             </FrameLayout>
 
+            <!-- Purple -->
             <FrameLayout
                 android:id="@+id/colorPurple"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginEnd="16dp">
+                android:layout_marginEnd="16dp"
+                android:padding="2dp">
 
                 <View
                     android:layout_width="match_parent"
@@ -182,18 +204,21 @@
 
                 <ImageView
                     android:id="@+id/checkPurple"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_gravity="center"
-                    android:src="@android:drawable/ic_menu_gallery"
-                    app:tint="#FFFFFF"
-                    android:visibility="gone" />
+                    android:src="@android:drawable/ic_menu_camera"
+                    android:visibility="gone"
+                    app:tint="#FFFFFF" />
             </FrameLayout>
 
+            <!-- Orange -->
             <FrameLayout
                 android:id="@+id/colorOrange"
                 android:layout_width="40dp"
-                android:layout_height="40dp">
+                android:layout_height="40dp"
+                android:layout_marginEnd="16dp"
+                android:padding="2dp">
 
                 <View
                     android:layout_width="match_parent"
@@ -202,12 +227,12 @@
 
                 <ImageView
                     android:id="@+id/checkOrange"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_gravity="center"
-                    android:src="@android:drawable/ic_menu_gallery"
-                    app:tint="#FFFFFF"
-                    android:visibility="gone" />
+                    android:src="@android:drawable/ic_menu_camera"
+                    android:visibility="gone"
+                    app:tint="#FFFFFF" />
             </FrameLayout>
 
         </LinearLayout>
@@ -219,8 +244,7 @@
         android:layout_height="wrap_content"
         android:text="Save Income"
         android:textAllCaps="false"
-        android:padding="16dp"
         app:cornerRadius="12dp"
-        android:backgroundTint="@color/primary" />
+        app:backgroundTint="@color/primary" />
 
 </LinearLayout>

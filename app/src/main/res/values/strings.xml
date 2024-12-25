@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Moni</string>
+    <string name="income_type">Select Income Type</string>
+    <string name="select_currency_desc">Select or enter currency</string>
 </resources>

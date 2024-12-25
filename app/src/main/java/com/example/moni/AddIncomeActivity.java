@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.AutoCompleteTextView;
 import com.google.android.material.button.MaterialButton;
@@ -90,6 +91,14 @@ public class AddIncomeActivity extends AppCompatActivity {
                 R.id.colorOrange
         };
 
+        int[] checkViews = {
+                R.id.checkRed,
+                R.id.checkBlue,
+                R.id.checkGreen,
+                R.id.checkPurple,
+                R.id.checkOrange
+        };
+
         String[] colors = {
                 "#FF4444",
                 "#4444FF",
@@ -100,25 +109,42 @@ public class AddIncomeActivity extends AppCompatActivity {
 
         // Set initial selection
         View initialColorView = findViewById(R.id.colorRed);
-        initialColorView.setScaleX(1.2f);
-        initialColorView.setScaleY(1.2f);
+        ImageView initialCheckView = findViewById(R.id.checkRed);
+        initialColorView.setScaleX(1.1f);
+        initialColorView.setScaleY(1.1f);
+        initialCheckView.setVisibility(View.VISIBLE);
         lastSelectedColorView = initialColorView;
+        selectedColor = colors[0];
+
+        // Hide all check icons initially except the first one
+        for (int i = 1; i < checkViews.length; i++) {
+            findViewById(checkViews[i]).setVisibility(View.GONE);
+        }
 
         // Setup click listeners
         for (int i = 0; i < colorViews.length; i++) {
             int finalI = i;
             View colorView = findViewById(colorViews[i]);
+            ImageView checkView = findViewById(checkViews[i]);
+
             colorView.setOnClickListener(v -> {
                 // Reset last selection
                 if (lastSelectedColorView != null) {
                     lastSelectedColorView.setScaleX(1.0f);
                     lastSelectedColorView.setScaleY(1.0f);
+                    // Find and hide the last check icon
+                    for (int checkId : checkViews) {
+                        findViewById(checkId).setVisibility(View.GONE);
+                    }
                 }
 
-                // Scale up selected color
-                v.setScaleX(1.2f);
-                v.setScaleY(1.2f);
+                // Scale up selected color (smaller scale factor)
+                v.setScaleX(1.1f);
+                v.setScaleY(1.1f);
                 lastSelectedColorView = v;
+
+                // Show check icon for selected color
+                checkView.setVisibility(View.VISIBLE);
 
                 selectedColor = colors[finalI];
             });
