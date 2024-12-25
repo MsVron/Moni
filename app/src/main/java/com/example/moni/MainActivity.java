@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
     private CardView cardIncome;
     private CardView cardIncomeHistory;
     private CardView cardExpense;
-    private Button btnLogout;
     private FloatingActionButton fabAddTransaction;
 
     @Override
@@ -57,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
         cardIncome = findViewById(R.id.cardIncome);
         cardIncomeHistory = findViewById(R.id.cardIncomeHistory);
         cardExpense = findViewById(R.id.cardExpense);
-        btnLogout = findViewById(R.id.btnLogout);
         fabAddTransaction = findViewById(R.id.fabAddTransaction);
         drawerLayout = findViewById(R.id.drawerLayout);
     }
@@ -67,7 +65,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_menu_sort_by_size);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_menu_sort_by_size); // Using default menu icon for now
         }
 
         NavigationView navigationView = findViewById(R.id.navigationView);
@@ -79,6 +78,11 @@ public class MainActivity extends AppCompatActivity {
             } else if (id == R.id.nav_settings) {
                 startActivity(new Intent(this, SettingsActivity.class));
                 drawerLayout.closeDrawers();
+                return true;
+            } else if (id == R.id.nav_logout) {
+                sessionManager.logout();
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
                 return true;
             }
             return false;
@@ -94,12 +98,6 @@ public class MainActivity extends AppCompatActivity {
 
         cardExpense.setOnClickListener(v ->
                 Toast.makeText(this, "Coming soon!", Toast.LENGTH_SHORT).show());
-
-        btnLogout.setOnClickListener(v -> {
-            sessionManager.logout();
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-        });
 
         fabAddTransaction.setOnClickListener(v ->
                 startActivity(new Intent(this, AddIncomeActivity.class)));
