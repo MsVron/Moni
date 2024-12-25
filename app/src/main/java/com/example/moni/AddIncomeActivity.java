@@ -53,6 +53,11 @@ public class AddIncomeActivity extends AppCompatActivity {
         ArrayAdapter<String> currencyAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, currencies);
         spinnerCurrency.setAdapter(currencyAdapter);
 
+        // Retrieve and set the default currency from session manager
+        SessionManager sessionManager = new SessionManager(this);
+        String defaultCurrency = sessionManager.getDefaultCurrency();
+        spinnerCurrency.setText(defaultCurrency, false);
+
         // Setup date picker
         etDate.setOnClickListener(v -> showDatePicker());
 

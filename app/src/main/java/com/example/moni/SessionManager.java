@@ -10,6 +10,7 @@ public class SessionManager {
     private static final String KEY_USER_EMAIL = "userEmail";
     private static final String KEY_USER_NAME = "userName";
     private static final String KEY_USER_ID = "userId";
+    private static final String KEY_DEFAULT_CURRENCY = "defaultCurrency";
 
     public SessionManager(Context context) {
         // Using application context to avoid memory leaks
@@ -22,7 +23,7 @@ public class SessionManager {
         editor.putString(KEY_USER_EMAIL, userEmail);
         editor.putString(KEY_USER_NAME, userName);
         editor.putInt(KEY_USER_ID, userId);
-        editor.commit();  // Using commit() instead of apply() for immediate effect
+        editor.commit(); // Using commit() for immediate effect
     }
 
     public boolean isLoggedIn() {
@@ -37,8 +38,21 @@ public class SessionManager {
         return pref.getInt(KEY_USER_ID, -1);
     }
 
+    public void setDefaultCurrency(String currency) {
+        editor.putString(KEY_DEFAULT_CURRENCY, currency);
+        editor.commit();
+    }
+
+    public String getDefaultCurrency() {
+        // Default to "USD" if no value is set
+        return pref.getString(KEY_DEFAULT_CURRENCY, "USD");
+    }
+
     public void logout() {
+        // Preserve the default currency setting during logout
+        String defaultCurrency = getDefaultCurrency();
         editor.clear();
+        editor.putString(KEY_DEFAULT_CURRENCY, defaultCurrency);
         editor.commit();
     }
 }

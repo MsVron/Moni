@@ -2,16 +2,32 @@ package com.example.moni;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private AppDatabase db;
+    private DrawerLayout drawerLayout;
+
+    // UI Elements
+    private TextView tvWelcome;
+    private TextView tvBalance;
+    private CardView cardIncome;
+    private CardView cardIncomeHistory;
+    private CardView cardExpense;
+    private Button btnLogout;
+    private FloatingActionButton fabAddTransaction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,46 +44,79 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // Set welcome message
-        TextView tvWelcome = findViewById(R.id.tvWelcome);
-        tvWelcome.setText("Welcome, " + sessionManager.getUserName() + "!");
+        initializeViews();
+        setupToolbarAndDrawer();
+        setupClickListeners();
+        updateWelcomeAndBalance();
+    }
 
-        // Initialize balance display
-        TextView tvBalance = findViewById(R.id.tvBalance);
-        updateBalance();
+    private void initializeViews() {
+        // Find all views
+        tvWelcome = findViewById(R.id.tvWelcome);
+        tvBalance = findViewById(R.id.tvBalance);
+        cardIncome = findViewById(R.id.cardIncome);
+        cardIncomeHistory = findViewById(R.id.cardIncomeHistory);
+        cardExpense = findViewById(R.id.cardExpense);
+        btnLogout = findViewById(R.id.btnLogout);
+        fabAddTransaction = findViewById(R.id.fabAddTransaction);
+        drawerLayout = findViewById(R.id.drawerLayout);
+    }
 
-        // Setup income card click
-        CardView cardIncome = findViewById(R.id.cardIncome);
+    private void setupToolbarAndDrawer() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_menu_sort_by_size);
+        }
+
+        NavigationView navigationView = findViewById(R.id.navigationView);
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_dashboard) {
+                drawerLayout.closeDrawers();
+                return true;
+            } else if (id == R.id.nav_settings) {
+                startActivity(new Intent(this, SettingsActivity.class));
+                drawerLayout.closeDrawers();
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private void setupClickListeners() {
         cardIncome.setOnClickListener(v ->
-                startActivity(new Intent(this, AddIncomeActivity.class))
-        );
+                startActivity(new Intent(this, AddIncomeActivity.class)));
 
-        // Setup income history card click
-        CardView cardIncomeHistory = findViewById(R.id.cardIncomeHistory); // Ensure this ID exists in your XML
         cardIncomeHistory.setOnClickListener(v ->
-                startActivity(new Intent(this, IncomeHistoryActivity.class))
-        );
+                startActivity(new Intent(this, IncomeHistoryActivity.class)));
 
-        // Setup expense card click
-        CardView cardExpense = findViewById(R.id.cardExpense);
         cardExpense.setOnClickListener(v ->
-                // TODO: Implement expense activity
-                Toast.makeText(this, "Coming soon!", Toast.LENGTH_SHORT).show()
-        );
+                Toast.makeText(this, "Coming soon!", Toast.LENGTH_SHORT).show());
 
-        // Setup logout
-        Button btnLogout = findViewById(R.id.btnLogout);
         btnLogout.setOnClickListener(v -> {
             sessionManager.logout();
             startActivity(new Intent(this, LoginActivity.class));
             finish();
         });
 
-        // Setup FAB
-        FloatingActionButton fabAddTransaction = findViewById(R.id.fabAddTransaction);
         fabAddTransaction.setOnClickListener(v ->
-                startActivity(new Intent(this, AddIncomeActivity.class))
-        );
+                startActivity(new Intent(this, AddIncomeActivity.class)));
+    }
+
+    private void updateWelcomeAndBalance() {
+        tvWelcome.setText("Welcome, " + sessionManager.getUserName() + "!");
+        updateBalance();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            drawerLayout.openDrawer(GravityCompat.START);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -79,15 +128,17 @@ public class MainActivity extends AppCompatActivity {
     private void updateBalance() {
         new Thread(() -> {
             try {
-                int userId = sessionManager.getUserId();  // Get user ID
-                double totalIncome = db.incomeDao().getTotalIncome(userId);  // Use the user ID to get the total income
+                int userId = sessionManager.getUserId();
+                double totalIncome = db.incomeDao().getTotalIncome(userId);
                 runOnUiThread(() -> {
-                    TextView tvBalance = findViewById(R.id.tvBalance);
                     String formattedBalance = String.format("$%.2f", totalIncome);
                     tvBalance.setText(formattedBalance);
                 });
             } catch (Exception e) {
                 e.printStackTrace();
+                runOnUiThread(() ->
+                        Toast.makeText(this, "Error updating balance", Toast.LENGTH_SHORT).show()
+                );
             }
         }).start();
     }
