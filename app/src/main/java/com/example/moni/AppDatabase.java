@@ -8,12 +8,13 @@ import androidx.room.RoomDatabase;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {User.class, Income.class}, version = 2, exportSchema = false)
+@Database(entities = {User.class, Income.class, Expense.class}, version = 3, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase instance;
 
     public abstract UserDao userDao();
     public abstract IncomeDao incomeDao();
+    public abstract ExpenseDao expenseDao();
 
     public static synchronized AppDatabase getInstance(Context context) {
         if (instance == null) {
@@ -22,8 +23,8 @@ public abstract class AppDatabase extends RoomDatabase {
                             AppDatabase.class,
                             "moni_db"
                     )
-                    .addMigrations(MIGRATION_1_2)  // Added migration logic
-                    .fallbackToDestructiveMigration()  // Ensures recreation if migration is not provided
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    .fallbackToDestructiveMigration()
                     .build();
         }
         return instance;
@@ -41,6 +42,22 @@ public abstract class AppDatabase extends RoomDatabase {
                     + "name TEXT)");
             database.execSQL("INSERT INTO users (id, email, password, name) SELECT id, email, password, name FROM users_old");
             database.execSQL("DROP TABLE users_old");
+        }
+    };
+
+    // Migration from version 2 to version 3 (adding expense table)
+    static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS expense ("
+                    + "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
+                    + "userId INTEGER NOT NULL,"
+                    + "amount REAL NOT NULL,"
+                    + "type TEXT,"
+                    + "date TEXT,"
+                    + "description TEXT,"
+                    + "color TEXT,"
+                    + "currency TEXT)");
         }
     };
 }

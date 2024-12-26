@@ -3,15 +3,13 @@ package com.example.moni;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
@@ -45,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
         initializeViews();
         setupToolbarAndDrawer();
+        setupNavigationDrawer(); // Added new navigation setup
         setupClickListeners();
         updateWelcomeAndBalance();
     }
@@ -66,13 +65,19 @@ public class MainActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowTitleEnabled(false);
-            getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_menu_sort_by_size); // Using default menu icon for now
+            getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_menu_sort_by_size);
         }
+    }
 
+    private void setupNavigationDrawer() {
         NavigationView navigationView = findViewById(R.id.navigationView);
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_dashboard) {
+                drawerLayout.closeDrawers();
+                return true;
+            } else if (id == R.id.nav_history) {
+                startActivity(new Intent(this, HistoryActivity.class));
                 drawerLayout.closeDrawers();
                 return true;
             } else if (id == R.id.nav_settings) {
@@ -94,18 +99,41 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, AddIncomeActivity.class)));
 
         cardIncomeHistory.setOnClickListener(v ->
-                startActivity(new Intent(this, IncomeHistoryActivity.class)));
+                startActivity(new Intent(this, HistoryActivity.class)));
 
         cardExpense.setOnClickListener(v ->
-                Toast.makeText(this, "Coming soon!", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(this, AddExpenseActivity.class)));
 
-        fabAddTransaction.setOnClickListener(v ->
-                startActivity(new Intent(this, AddIncomeActivity.class)));
+        fabAddTransaction.setOnClickListener(v -> {
+            AddTransactionBottomSheet bottomSheet = new AddTransactionBottomSheet();
+            bottomSheet.show(getSupportFragmentManager(), "addTransaction");
+        });
     }
 
     private void updateWelcomeAndBalance() {
         tvWelcome.setText("Welcome, " + sessionManager.getUserName() + "!");
         updateBalance();
+    }
+
+    private void updateBalance() {
+        new Thread(() -> {
+            try {
+                int userId = sessionManager.getUserId();
+                double totalIncome = db.incomeDao().getTotalIncome(userId);
+                double totalExpense = db.expenseDao().getTotalExpense(userId);
+                double balance = totalIncome - totalExpense;
+
+                runOnUiThread(() -> {
+                    String formattedBalance = String.format("$%.2f", balance);
+                    tvBalance.setText(formattedBalance);
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() ->
+                        Toast.makeText(this, "Error updating balance", Toast.LENGTH_SHORT).show()
+                );
+            }
+        }).start();
     }
 
     @Override
@@ -121,23 +149,5 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateBalance();
-    }
-
-    private void updateBalance() {
-        new Thread(() -> {
-            try {
-                int userId = sessionManager.getUserId();
-                double totalIncome = db.incomeDao().getTotalIncome(userId);
-                runOnUiThread(() -> {
-                    String formattedBalance = String.format("$%.2f", totalIncome);
-                    tvBalance.setText(formattedBalance);
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-                runOnUiThread(() ->
-                        Toast.makeText(this, "Error updating balance", Toast.LENGTH_SHORT).show()
-                );
-            }
-        }).start();
     }
 }
