@@ -15,6 +15,10 @@ public class LoginActivity extends AppCompatActivity {
     private AppDatabase db;
     private SessionManager sessionManager;
 
+    // Add admin credentials
+    private static final String ADMIN_USERNAME = "admin";
+    private static final String ADMIN_PASSWORD = "admin";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,32 +55,29 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        // Email validation
+        // First check if it's an admin login
+        if (email.equals(ADMIN_USERNAME) && password.equals(ADMIN_PASSWORD)) {
+            sessionManager.setAdminLogin(true);
+            startActivity(new Intent(this, AdminDashboardActivity.class));
+            finish();
+            return;
+        }
+
+        // If not admin, proceed with regular user login
         if (!isValidEmail(email)) {
             Toast.makeText(this, "Please enter a valid email address", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Log email for debugging
-        Log.d(TAG, "Attempting login with email: " + email);
-
         new Thread(() -> {
             try {
-                // Hash the password before checking
                 String hashedPassword = hashPassword(password);
                 User user = db.userDao().getUser(email, hashedPassword);
                 runOnUiThread(() -> {
                     if (user != null) {
-                        try {
-                            Log.d(TAG, "User found, setting login state");
-                            sessionManager.setLogin(true, user.getEmail(), user.getName(), user.getId());
-                            startActivity(new Intent(this, MainActivity.class));
-                            finish();
-                        } catch (Exception e) {
-                            Log.e(TAG, "Error setting login state: ", e);
-                            Toast.makeText(this, "Error during login: " + e.getMessage(),
-                                    Toast.LENGTH_SHORT).show();
-                        }
+                        sessionManager.setLogin(true, user.getEmail(), user.getName(), user.getId());
+                        startActivity(new Intent(this, MainActivity.class));
+                        finish();
                     } else {
                         Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show();
                     }

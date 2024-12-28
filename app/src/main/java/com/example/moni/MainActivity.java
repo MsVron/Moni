@@ -12,6 +12,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private SessionManager sessionManager;
@@ -41,11 +42,19 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        // If admin, go to admin dashboard
+        if (sessionManager.isAdmin()) {
+            startActivity(new Intent(this, AdminDashboardActivity.class));
+            finish();
+            return;
+        }
+
         initializeViews();
         setupToolbarAndDrawer();
-        setupNavigationDrawer(); // Added new navigation setup
+        setupNavigationDrawer();
         setupClickListeners();
         updateWelcomeAndBalance();
+        checkForActiveOffers();
     }
 
     private void initializeViews() {
@@ -78,6 +87,14 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             } else if (id == R.id.nav_history) {
                 startActivity(new Intent(this, HistoryActivity.class));
+                drawerLayout.closeDrawers();
+                return true;
+            } else if (id == R.id.nav_offers) {  // Handle navigation to Offers
+                startActivity(new Intent(this, OffersActivity.class));
+                drawerLayout.closeDrawers();
+                return true;
+            } else if (id == R.id.nav_premium) {  // Handle navigation to Premium
+                startActivity(new Intent(this, SubscriptionActivity.class));
                 drawerLayout.closeDrawers();
                 return true;
             } else if (id == R.id.nav_settings) {
@@ -134,6 +151,40 @@ public class MainActivity extends AppCompatActivity {
                 );
             }
         }).start();
+    }
+
+    private void checkForActiveOffers() {
+        new Thread(() -> {
+            try {
+                List<Offer> activeOffers = db.offerDao().getActiveOffers(System.currentTimeMillis());
+                if (!activeOffers.isEmpty()) {
+                    Offer offer = activeOffers.get(0);
+                    if (!sessionManager.hasSeenOffer(offer.getId())) {
+                        runOnUiThread(() -> showOfferDialog(offer));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private void showOfferDialog(Offer offer) {
+        OfferDialog dialog = new OfferDialog(this, offer, new OfferDialog.OnOfferActionListener() {
+            @Override
+            public void onLearnMore(Offer offer) {
+                if (offer.getType().equals("SUBSCRIPTION")) {
+                    startActivity(new Intent(MainActivity.this, SubscriptionActivity.class));
+                }
+                sessionManager.markOfferAsSeen(offer.getId());
+            }
+
+            @Override
+            public void onDismiss(Offer offer) {
+                sessionManager.markOfferAsSeen(offer.getId());
+            }
+        });
+        dialog.show();
     }
 
     @Override
