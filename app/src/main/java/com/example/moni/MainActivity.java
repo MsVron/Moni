@@ -54,11 +54,9 @@ public class MainActivity extends AppCompatActivity {
         setupNavigationDrawer();
         setupClickListeners();
         updateWelcomeAndBalance();
-        checkForActiveOffers();
     }
 
     private void initializeViews() {
-        // Find all views
         tvWelcome = findViewById(R.id.tvWelcome);
         tvBalance = findViewById(R.id.tvBalance);
         cardIncome = findViewById(R.id.cardIncome);
@@ -89,11 +87,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, HistoryActivity.class));
                 drawerLayout.closeDrawers();
                 return true;
-            } else if (id == R.id.nav_offers) {  // Handle navigation to Offers
+            } else if (id == R.id.nav_offers) {
                 startActivity(new Intent(this, OffersActivity.class));
                 drawerLayout.closeDrawers();
                 return true;
-            } else if (id == R.id.nav_premium) {  // Handle navigation to Premium
+            } else if (id == R.id.nav_premium) {
                 startActivity(new Intent(this, SubscriptionActivity.class));
                 drawerLayout.closeDrawers();
                 return true;
@@ -188,17 +186,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        updateBalance();
+        checkForActiveOffers(); // Call this method to check for active offers
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sessionManager.clearSeenOffers(); // Clear seen offers when the activity is paused
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             drawerLayout.openDrawer(GravityCompat.START);
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateBalance();
     }
 }

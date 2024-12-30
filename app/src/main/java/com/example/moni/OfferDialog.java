@@ -63,34 +63,30 @@ public class OfferDialog extends Dialog {
         tvDescription.setText(offer.getDescription());
 
         // Load image
+        // Load image
         if (offer.getImageUrl() != null) {
             try {
                 Uri imageUri = Uri.parse(offer.getImageUrl());
-                // Add logging
-                Log.d("OfferDialog", "Loading image from URI: " + imageUri);
 
                 // Request permission to read URI
                 getContext().getContentResolver().takePersistableUriPermission(
                         imageUri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION
-                );
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
                 ivOfferImage.setImageURI(imageUri);
 
-                // Add error checking
+                // Check if the image loaded successfully, else fallback to a default image
                 if (ivOfferImage.getDrawable() == null) {
                     Log.e("OfferDialog", "Failed to load image, falling back to default");
-                    ivOfferImage.setImageResource(android.R.drawable.ic_menu_gallery);
+                    ivOfferImage.setImageResource(android.R.drawable.ic_menu_gallery); // Fallback default image
                 }
             } catch (Exception e) {
                 Log.e("OfferDialog", "Error loading image: " + e.getMessage());
                 e.printStackTrace();
-                ivOfferImage.setImageResource(android.R.drawable.ic_menu_gallery);
+                ivOfferImage.setImageResource(android.R.drawable.ic_menu_gallery); // Fallback default image
             }
-        } else {
-            Log.d("OfferDialog", "No image URL provided");
-            ivOfferImage.setImageResource(android.R.drawable.ic_menu_gallery);
         }
+
 
         // Set timer
         long timeRemaining = offer.getEndTime() - System.currentTimeMillis();

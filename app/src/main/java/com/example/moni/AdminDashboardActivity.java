@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -21,6 +22,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.Calendar;
+import java.util.List;
 
 public class AdminDashboardActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -80,7 +82,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 startActivity(new Intent(this, OffersActivity.class));
             } else if (id == R.id.nav_view_subscriptions) {
                 startActivity(new Intent(this, SubscriptionActivity.class));
-            } else if (id == R.id.nav_manage_subscriptions) {    // Add this section
+            } else if (id == R.id.nav_manage_subscriptions) {
                 startActivity(new Intent(this, SubscriptionManagerActivity.class));
                 drawerLayout.closeDrawers();
                 return true;
@@ -144,10 +146,15 @@ public class AdminDashboardActivity extends AppCompatActivity {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
             selectedImageUri = data.getData();
             if (selectedImageUri != null) {
+                // Correct permission flags
+                final int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+                getContentResolver().takePersistableUriPermission(selectedImageUri, takeFlags);
+
                 ivOfferImage.setImageURI(selectedImageUri);
             }
         }
     }
+
 
     private void saveOffer() {
         String title = etOfferTitle.getText().toString();
@@ -159,22 +166,32 @@ public class AdminDashboardActivity extends AppCompatActivity {
             return;
         }
 
-        // Get a persistent URI permission
-        getContentResolver().takePersistableUriPermission(
-                selectedImageUri,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION
-        );
-
         Offer offer = new Offer(title, description, endTime);
-        // Store the actual URI string
+
+        // Store the persistable URI
         offer.setImageUrl(selectedImageUri.toString());
         offer.setActive(true);
+
+        // Add logging
+        Log.d("AdminDashboard", "Saving offer: " +
+                "\nTitle: " + title +
+                "\nDescription: " + description +
+                "\nEndTime: " + endTime +
+                "\nImageUrl: " + selectedImageUri +
+                "\nIsActive: " + offer.isActive());
 
         new Thread(() -> {
             db.offerDao().insert(offer);
             runOnUiThread(() -> {
                 clearOfferFields();
                 Toast.makeText(this, "Offer saved successfully", Toast.LENGTH_SHORT).show();
+                // Add logging after save
+                try {
+                    List<Offer> offers = db.offerDao().getActiveOffers(System.currentTimeMillis());
+                    Log.d("AdminDashboard", "Total active offers after save: " + offers.size());
+                } catch (Exception e) {
+                    Log.e("AdminDashboard", "Error checking offers: " + e.getMessage());
+                }
             });
         }).start();
     }

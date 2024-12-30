@@ -84,4 +84,10 @@ public class SessionManager {
         editor.putStringSet(PREF_SEEN_OFFERS, seenOffers);
         editor.commit();
     }
+
+    public void clearSeenOffers() {
+        editor.remove(PREF_SEEN_OFFERS);
+        editor.commit();
+    }
+
 }
