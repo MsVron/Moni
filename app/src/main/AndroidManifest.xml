@@ -2,6 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.moni">
 
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.OPEN_DOCUMENT" />
+            <data android:mimeType="image/*" />
+        </intent>
+    </queries>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,45 +19,36 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
-        <activity
-            android:name=".SubscriptionManagerActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SubscriptionActivity"
-            android:exported="false" />
-        <activity
-            android:name=".OffersActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AdminDashboardActivity"
-            android:exported="false" />
-        <activity
-            android:name=".HistoryActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AddExpenseActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AddIncomeActivity"
-            android:exported="false" />
+
+        <!-- Launcher Activity -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".RegisterActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
-    </application>
 
+        <!-- User Authentication Activities -->
+        <activity android:name=".RegisterActivity" android:exported="false" />
+
+        <!-- Core App Activities -->
+        <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".SettingsActivity" android:exported="false" />
+
+        <!-- Subscription Management -->
+        <activity android:name=".SubscriptionManagerActivity" android:exported="false" />
+        <activity android:name=".SubscriptionActivity" android:exported="false" />
+
+        <!-- Admin Features -->
+        <activity android:name=".AdminDashboardActivity" android:exported="false" />
+        <activity android:name=".OffersActivity" android:exported="false" />
+
+        <!-- Financial Features -->
+        <activity android:name=".AddIncomeActivity" android:exported="false" />
+        <activity android:name=".AddExpenseActivity" android:exported="false" />
+        <activity android:name=".HistoryActivity" android:exported="false" />
+
+    </application>
 </manifest>

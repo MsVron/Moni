@@ -2,9 +2,11 @@ package com.example.moni;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -46,15 +48,34 @@ public class OfferDialog extends Dialog {
         tvTitle.setText(offer.getTitle());
         tvDescription.setText(offer.getDescription());
 
-        // Load image
+// Load image
         if (offer.getImageUrl() != null) {
             try {
                 Uri imageUri = Uri.parse(offer.getImageUrl());
+                // Add logging
+                Log.d("OfferDialog", "Loading image from URI: " + imageUri);
+
+                // Request permission to read URI
+                getContext().getContentResolver().takePersistableUriPermission(
+                        imageUri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                );
+
                 ivOfferImage.setImageURI(imageUri);
+
+                // Add error checking
+                if (ivOfferImage.getDrawable() == null) {
+                    Log.e("OfferDialog", "Failed to load image, falling back to default");
+                    ivOfferImage.setImageResource(android.R.drawable.ic_menu_gallery);
+                }
             } catch (Exception e) {
+                Log.e("OfferDialog", "Error loading image: " + e.getMessage());
                 e.printStackTrace();
-                ivOfferImage.setImageResource(android.R.drawable.ic_menu_gallery);// Default image fallback
+                ivOfferImage.setImageResource(android.R.drawable.ic_menu_gallery);
             }
+        } else {
+            Log.d("OfferDialog", "No image URL provided");
+            ivOfferImage.setImageResource(android.R.drawable.ic_menu_gallery);
         }
 
         // Set timer
