@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -36,6 +37,19 @@ public class OfferDialog extends Dialog {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_offer);
 
+        // Set dialog dimensions
+        Window window = getWindow();
+        if (window != null) {
+            window.setLayout(
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT
+            );
+            // Optional: add some margin
+            WindowManager.LayoutParams params = window.getAttributes();
+            params.width = (int)(getContext().getResources().getDisplayMetrics().widthPixels * 0.9);  // 90% of screen width
+            window.setAttributes(params);
+        }
+
         // Initialize views
         TextView tvTitle = findViewById(R.id.tvOfferTitle);
         TextView tvDescription = findViewById(R.id.tvOfferDescription);
@@ -48,7 +62,7 @@ public class OfferDialog extends Dialog {
         tvTitle.setText(offer.getTitle());
         tvDescription.setText(offer.getDescription());
 
-// Load image
+        // Load image
         if (offer.getImageUrl() != null) {
             try {
                 Uri imageUri = Uri.parse(offer.getImageUrl());
