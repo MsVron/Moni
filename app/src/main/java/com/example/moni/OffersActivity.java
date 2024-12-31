@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class OffersActivity extends AppCompatActivity implements OffersAdapter.OnOfferClickListener {
@@ -82,8 +84,10 @@ public class OffersActivity extends AppCompatActivity implements OffersAdapter.O
 
     @Override
     public void onOfferClick(Offer offer) {
-        // Show offer details in dialog
-        OfferDialog dialog = new OfferDialog(this, offer, new OfferDialog.OnOfferActionListener() {
+        List<Offer> singleOfferList = new ArrayList<>();
+        singleOfferList.add(offer);
+
+        OfferDialog dialog = new OfferDialog(this, singleOfferList, new OfferDialog.OnOfferActionListener() {
             @Override
             public void onLearnMore(Offer offer) {
                 if ("SUBSCRIPTION".equals(offer.getType())) {
@@ -99,6 +103,7 @@ public class OffersActivity extends AppCompatActivity implements OffersAdapter.O
         });
         dialog.show();
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

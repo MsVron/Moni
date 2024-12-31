@@ -12,7 +12,7 @@ public interface OfferDao {
     void insert(Offer offer);
 
     @Query("SELECT * FROM offers WHERE isActive = 1 AND endTime > :currentTime ORDER BY endTime DESC")
-    List<Offer> getActiveOffers(long currentTime);
+    List<Offer> getActiveOffers(long currentTime); // This correctly returns a List<Offer>
 
     @Update
     void update(Offer offer);

@@ -156,10 +156,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 List<Offer> activeOffers = db.offerDao().getActiveOffers(System.currentTimeMillis());
                 if (!activeOffers.isEmpty()) {
-                    Offer offer = activeOffers.get(0);
-                    if (!sessionManager.hasSeenOffer(offer.getId())) {
-                        runOnUiThread(() -> showOfferDialog(offer));
-                    }
+                    runOnUiThread(() -> showOfferDialog(activeOffers));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -167,8 +164,10 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void showOfferDialog(Offer offer) {
-        OfferDialog dialog = new OfferDialog(this, offer, new OfferDialog.OnOfferActionListener() {
+
+
+    private void showOfferDialog(List<Offer> offers) {
+        OfferDialog dialog = new OfferDialog(this, offers, new OfferDialog.OnOfferActionListener() {
             @Override
             public void onLearnMore(Offer offer) {
                 if (offer.getType().equals("SUBSCRIPTION")) {
@@ -184,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
         });
         dialog.show();
     }
+
 
     @Override
     protected void onResume() {

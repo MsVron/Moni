@@ -19,6 +19,15 @@
             android:layout_height="250dp"
             android:scaleType="centerCrop"/>
 
+        <!-- Add dots indicator -->
+        <LinearLayout
+            android:id="@+id/dotsIndicator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8dp"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -72,6 +81,14 @@
                     android:text="Dismiss"
                     android:layout_marginStart="8dp"/>
             </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnNextOffer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Next Offer"
+                android:layout_marginTop="8dp"/>
+
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
