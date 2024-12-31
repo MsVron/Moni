@@ -29,9 +29,23 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(v -> attemptRegister());
     }
 
+    private String capitalizeWords(String str) {
+        if (str.isEmpty()) return str;
+        String[] words = str.toLowerCase().split("\\s");
+        StringBuilder result = new StringBuilder();
+
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                result.append(Character.toUpperCase(word.charAt(0)))
+                        .append(word.substring(1))
+                        .append(" ");
+            }
+        }
+        return result.toString().trim();
+    }
     private void attemptRegister() {
         // Get the input values
-        final String inputName = etName.getText().toString().trim();
+        final String inputName = capitalizeWords(etName.getText().toString().trim());
         final String inputEmail = etEmail.getText().toString().trim();
         final String inputPassword = etPassword.getText().toString().trim();
         final String inputConfirmPassword = etConfirmPassword.getText().toString().trim();

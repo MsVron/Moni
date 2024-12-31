@@ -189,6 +189,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateBalance();
+        updateWelcomeAndBalance();
         checkForActiveOffers(); // Call this method to check for active offers
     }
 

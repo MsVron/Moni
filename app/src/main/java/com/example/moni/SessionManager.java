@@ -90,4 +90,13 @@ public class SessionManager {
         editor.commit();
     }
 
+    public void updateUserName(String newName) {
+        editor.putString(KEY_USER_NAME, newName);
+        editor.commit();
+    }
+
+    public String getUserEmail() {
+        return pref.getString(KEY_USER_EMAIL, "");
+    }
+
 }

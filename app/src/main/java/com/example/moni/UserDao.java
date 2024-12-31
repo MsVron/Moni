@@ -14,4 +14,10 @@ public interface UserDao {
 
     @Query("SELECT * FROM users WHERE email = :email")
     User getUserByEmail(String email);
+
+    @Query("UPDATE users SET name = :newName WHERE id = :userId")
+    void updateName(int userId, String newName);
+
+    @Query("UPDATE users SET password = :newPassword WHERE id = :userId")
+    void updatePassword(int userId, String newPassword);
 }
