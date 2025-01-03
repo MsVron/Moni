@@ -3,7 +3,7 @@ package com.example.moni;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;  // Add this import
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
@@ -26,6 +26,7 @@ public class AddExpenseActivity extends AppCompatActivity {
     private String selectedColor = "#FF4444";
     private View lastSelectedColorView;
     private ExpenseCategory selectedCategory;
+    private int expenseId = -1; // -1 means new expense
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +43,26 @@ public class AddExpenseActivity extends AppCompatActivity {
         setupDatePicker();
         setupColorSelection();
         setupRecurringExpense();
+
+        // Check if we're editing an existing expense
+        if (getIntent().hasExtra("EXPENSE_ID")) {
+            expenseId = getIntent().getIntExtra("EXPENSE_ID", -1);
+            populateFieldsForEditing();
+        }
+    }
+
+    private void populateFieldsForEditing() {
+        etAmount.setText(String.valueOf(getIntent().getDoubleExtra("EXPENSE_AMOUNT", 0)));
+        spinnerCategory.setText(getIntent().getStringExtra("EXPENSE_CATEGORY"), false);
+        spinnerSubcategory.setText(getIntent().getStringExtra("EXPENSE_SUBCATEGORY"), false);
+        etDate.setText(getIntent().getStringExtra("EXPENSE_DATE"));
+        etDescription.setText(getIntent().getStringExtra("EXPENSE_DESCRIPTION"));
+        selectedColor = getIntent().getStringExtra("EXPENSE_COLOR");
+        spinnerCurrency.setText(getIntent().getStringExtra("EXPENSE_CURRENCY"), false);
+        switchRecurring.setChecked(getIntent().getBooleanExtra("EXPENSE_IS_RECURRING", false));
+        if (switchRecurring.isChecked()) {
+            spinnerRecurringPeriod.setText(getIntent().getStringExtra("EXPENSE_RECURRING_PERIOD"), false);
+        }
     }
 
     private void setupToolbar() {
@@ -49,7 +70,7 @@ public class AddExpenseActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Add Expense");
+            getSupportActionBar().setTitle(expenseId != -1 ? "Edit Expense" : "Add Expense");
         }
     }
 
@@ -212,23 +233,22 @@ public class AddExpenseActivity extends AppCompatActivity {
             double amount = Double.parseDouble(amountStr);
             int userId = sessionManager.getUserId();
 
-            Expense expense = new Expense(
-                    userId,
-                    amount,
-                    category,
-                    subcategory,
-                    date,
-                    description,
-                    selectedColor,
-                    currency,
-                    isRecurring,
-                    recurringPeriod
-            );
+            Expense expense = new Expense(userId, amount, category, subcategory, date, description,
+                    selectedColor, currency, isRecurring, recurringPeriod);
+
+            if (expenseId != -1) {
+                expense.setId(expenseId);
+            }
 
             new Thread(() -> {
-                db.expenseDao().insert(expense);
+                if (expenseId != -1) {
+                    db.expenseDao().update(expense);
+                } else {
+                    db.expenseDao().insert(expense);
+                }
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "Expense saved successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, expenseId != -1 ? "Expense updated successfully" : "Expense saved successfully",
+                            Toast.LENGTH_SHORT).show();
                     finish();
                 });
             }).start();

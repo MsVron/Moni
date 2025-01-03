@@ -18,7 +18,7 @@
             android:id="@+id/colorIndicator"
             android:layout_width="4dp"
             android:layout_height="match_parent"
-            android:layout_marginEnd="16dp"/>
+            android:layout_marginEnd="16dp" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -32,31 +32,39 @@
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:textColor="@color/text_primary"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/tvDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/text_secondary"
-                android:layout_marginTop="4dp"/>
-
-            <TextView
-                android:id="@+id/tvDescription"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/text_secondary"
-                android:layout_marginTop="4dp"/>
-
-            <!-- New Subcategory TextView -->
             <TextView
                 android:id="@+id/tvSubcategory"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp"
-                android:layout_marginTop="2dp"/>
+                android:layout_marginTop="2dp" />
 
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvRecurring"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:textStyle="italic"
+                android:textSize="12sp"
+                android:layout_marginTop="4dp"
+                android:visibility="gone" />
         </LinearLayout>
 
         <TextView
@@ -65,17 +73,6 @@
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:textColor="@color/primary"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
     </LinearLayout>
-
-    <!-- New Recurring TextView -->
-    <TextView
-        android:id="@+id/tvRecurring"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/text_secondary"
-        android:textStyle="italic"
-        android:textSize="12sp"
-        android:layout_marginTop="4dp"
-        android:visibility="gone"/>
 </com.google.android.material.card.MaterialCardView>

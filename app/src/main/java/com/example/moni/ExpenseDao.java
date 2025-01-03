@@ -3,6 +3,7 @@ package com.example.moni;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
@@ -49,4 +50,12 @@ public interface ExpenseDao {
     // Retrieve the lowest expense recorded for a user
     @Query("SELECT * FROM expense WHERE userId = :userId ORDER BY amount ASC LIMIT 1")
     Expense getLowestExpense(int userId);
+
+    // Delete an expense by ID
+    @Query("DELETE FROM expense WHERE id = :id")
+    void delete(int id);
+
+    // Update an existing expense
+    @Update
+    void update(Expense expense);
 }

@@ -5,18 +5,20 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
-
 public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder> {
     private List<Expense> expenseList;
     private Context context;
+    private OnExpenseClickListener listener;
 
-    public ExpenseAdapter(Context context) {
+    public ExpenseAdapter(Context context, OnExpenseClickListener listener) {
         this.context = context;
+        this.listener = listener;
         this.expenseList = new ArrayList<>();
     }
 
@@ -54,6 +56,19 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
         if (expense.getColor() != null) {
             holder.colorIndicator.setBackgroundColor(Color.parseColor(expense.getColor()));
         }
+
+        // Handle button clicks
+        holder.btnEdit.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onEditClick(expense);
+            }
+        });
+
+        holder.btnDelete.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onDeleteClick(expense);
+            }
+        });
     }
 
     @Override
@@ -64,6 +79,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
     static class ExpenseViewHolder extends RecyclerView.ViewHolder {
         TextView tvCategory, tvSubcategory, tvDate, tvDescription, tvAmount, tvRecurring;
         View colorIndicator;
+        ImageButton btnEdit, btnDelete;  // Add these variables
 
         ExpenseViewHolder(View view) {
             super(view);
@@ -74,6 +90,13 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
             tvAmount = view.findViewById(R.id.tvAmount);
             tvRecurring = view.findViewById(R.id.tvRecurring);
             colorIndicator = view.findViewById(R.id.colorIndicator);
+            btnEdit = view.findViewById(R.id.btnEdit);  // Initialize edit button
+            btnDelete = view.findViewById(R.id.btnDelete);  // Initialize delete button
         }
+    }
+
+    public interface OnExpenseClickListener {
+        void onEditClick(Expense expense);
+        void onDeleteClick(Expense expense);
     }
 }
