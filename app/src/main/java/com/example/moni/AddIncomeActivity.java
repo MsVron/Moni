@@ -14,17 +14,16 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-import com.example.moni.AppDatabase;  // Update with your actual package name
-import com.example.moni.Income;  // Update with your actual package name
-import com.example.moni.SessionManager;
+
 
 public class AddIncomeActivity extends AppCompatActivity {
     private EditText etAmount, etDate, etDescription;
-    private AutoCompleteTextView spinnerType, spinnerCurrency;
+    private AutoCompleteTextView spinnerCategory, spinnerSubcategory, spinnerCurrency, spinnerRecurringPeriod;
+    private com.google.android.material.switchmaterial.SwitchMaterial switchRecurring;
+    private View layoutRecurringPeriod;
     private AppDatabase db;
     private Calendar calendar;
     private String selectedColor = "#FF4444";
-
     private View lastSelectedColorView;
 
     @Override
@@ -35,40 +34,79 @@ public class AddIncomeActivity extends AppCompatActivity {
         db = AppDatabase.getInstance(this);
         calendar = Calendar.getInstance();
 
-        // Initialize views
+        initializeViews();
+        setupSpinners();
+        setupDatePicker();
+        setupColorSelection();
+        setupRecurringIncome();
+    }
+
+    private void initializeViews() {
         etAmount = findViewById(R.id.etAmount);
         etDate = findViewById(R.id.etDate);
         etDescription = findViewById(R.id.etDescription);
-        spinnerType = findViewById(R.id.spinnerType);
-        spinnerCurrency = findViewById(R.id.spinnerCurrency); // Currency spinner
+        spinnerCategory = findViewById(R.id.spinnerType);
+        spinnerSubcategory = findViewById(R.id.spinnerSubcategory);
+        spinnerCurrency = findViewById(R.id.spinnerCurrency);
+        spinnerRecurringPeriod = findViewById(R.id.spinnerRecurringPeriod);
+        switchRecurring = findViewById(R.id.switchRecurring);
+        layoutRecurringPeriod = findViewById(R.id.layoutRecurringPeriod);
         MaterialButton btnSave = findViewById(R.id.btnSave);
+        btnSave.setOnClickListener(v -> saveIncome());
+    }
 
-        // Setup income type spinner
-        String[] incomeTypes = {"Salary", "Freelance", "Investment", "Business", "Other"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, incomeTypes);
-        spinnerType.setAdapter(adapter);
+    private void setupSpinners() {
+        // Setup income categories
+        String[] categories = new String[IncomeCategory.values().length];
+        for (int i = 0; i < IncomeCategory.values().length; i++) {
+            categories[i] = IncomeCategory.values()[i].getCategoryName();
+        }
+        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, categories);
+        spinnerCategory.setAdapter(categoryAdapter);
+
+        // Setup category selection listener
+        spinnerCategory.setOnItemClickListener((parent, view, position, id) -> {
+            IncomeCategory selectedCategory = IncomeCategory.values()[position];
+            updateSubcategories(selectedCategory);
+        });
 
         // Setup currency spinner
         String[] currencies = {"USD", "EUR", "GBP", "JPY"};
-        ArrayAdapter<String> currencyAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, currencies);
+        ArrayAdapter<String> currencyAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, currencies);
         spinnerCurrency.setAdapter(currencyAdapter);
 
-        // Retrieve and set the default currency from session manager
+        // Set default currency
         SessionManager sessionManager = new SessionManager(this);
-        String defaultCurrency = sessionManager.getDefaultCurrency();
-        spinnerCurrency.setText(defaultCurrency, false);
+        spinnerCurrency.setText(sessionManager.getDefaultCurrency(), false);
 
-        // Setup date picker
-        etDate.setOnClickListener(v -> showDatePicker());
+        // Setup recurring period spinner
+        String[] recurringPeriods = {"Daily", "Weekly", "Monthly", "Yearly"};
+        ArrayAdapter<String> periodAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, recurringPeriods);
+        spinnerRecurringPeriod.setAdapter(periodAdapter);
+    }
 
-        // Set current date as default
+    private void updateSubcategories(IncomeCategory category) {
+        ArrayAdapter<String> subcategoryAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, category.getSubcategories());
+        spinnerSubcategory.setAdapter(subcategoryAdapter);
+        spinnerSubcategory.setText("", false);
+    }
+
+    private void setupRecurringIncome() {
+        switchRecurring.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            layoutRecurringPeriod.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            if (!isChecked) {
+                spinnerRecurringPeriod.setText("", false);
+            }
+        });
+    }
+
+    private void setupDatePicker() {
         updateDateLabel();
-
-        // Set click listener to save income
-        btnSave.setOnClickListener(v -> saveIncome());
-
-        // Setup color selection
-        setupColorSelection();
+        etDate.setOnClickListener(v -> showDatePicker());
     }
 
     private void showDatePicker() {
@@ -159,28 +197,42 @@ public class AddIncomeActivity extends AppCompatActivity {
     private void saveIncome() {
         try {
             String amountStr = etAmount.getText().toString();
-            String type = spinnerType.getText().toString();
-            String currency = spinnerCurrency.getText().toString(); // Get selected currency
+            String category = spinnerCategory.getText().toString();
+            String subcategory = spinnerSubcategory.getText().toString();
+            String currency = spinnerCurrency.getText().toString();
             String date = etDate.getText().toString();
             String description = etDescription.getText().toString();
+            boolean isRecurring = switchRecurring.isChecked();
+            String recurringPeriod = isRecurring ? spinnerRecurringPeriod.getText().toString() : null;
 
-            if (amountStr.isEmpty() || type.isEmpty() || currency.isEmpty() || selectedColor == null) {
+            if (amountStr.isEmpty() || category.isEmpty() || subcategory.isEmpty()
+                    || currency.isEmpty() || (isRecurring && recurringPeriod == null)) {
                 Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             double amount = Double.parseDouble(amountStr);
             SessionManager sessionManager = new SessionManager(this);
-            int userId = sessionManager.getUserId(); // Get the user ID from session
+            int userId = sessionManager.getUserId();
 
-            Income income = new Income(userId, amount, type, date, description, selectedColor, currency); // Include color and currency
+            Income income = new Income(
+                    userId,
+                    amount,
+                    category,
+                    subcategory,
+                    date,
+                    description,
+                    selectedColor,
+                    currency,
+                    isRecurring,
+                    recurringPeriod
+            );
 
-            // Insert income into database
             new Thread(() -> {
                 db.incomeDao().insert(income);
                 runOnUiThread(() -> {
                     Toast.makeText(this, "Income saved successfully", Toast.LENGTH_SHORT).show();
-                    finish(); // Finish the activity after saving
+                    finish();
                 });
             }).start();
 

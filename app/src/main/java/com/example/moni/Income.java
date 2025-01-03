@@ -7,46 +7,59 @@ import androidx.room.PrimaryKey;
 public class Income {
     @PrimaryKey(autoGenerate = true)
     private int id;
-    private int userId;  // Add this field
+    private int userId;
     private double amount;
-    private String type;
+    private String category;      // Changed from type to category
+    private String subcategory;   // New field
     private String date;
     private String description;
-    private String color;  // New field for color
-    private String currency;  // New field for currency
+    private String color;
+    private String currency;
+    private boolean isRecurring;  // New field for recurring income
+    private String recurringPeriod; // "MONTHLY", "WEEKLY", etc.
 
     // Constructor including new fields
-    public Income(int userId, double amount, String type, String date, String description, String color, String currency) {
+    public Income(int userId, double amount, String category, String subcategory,
+                  String date, String description, String color, String currency,
+                  boolean isRecurring, String recurringPeriod) {
         this.userId = userId;
         this.amount = amount;
-        this.type = type;
+        this.category = category;
+        this.subcategory = subcategory;
         this.date = date;
         this.description = description;
-        this.color = color;  // Initialize color
-        this.currency = currency;  // Initialize currency
+        this.color = color;
+        this.currency = currency;
+        this.isRecurring = isRecurring;
+        this.recurringPeriod = recurringPeriod;
     }
 
-    // Getter and Setter for userId
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
+    // Add new getters and setters
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 
-    // Getter and Setter for color
-    public String getColor() { return color; }
-    public void setColor(String color) { this.color = color; }
+    public String getSubcategory() { return subcategory; }
+    public void setSubcategory(String subcategory) { this.subcategory = subcategory; }
 
-    // Getter and Setter for currency
-    public String getCurrency() { return currency; }
-    public void setCurrency(String currency) { this.currency = currency; }
+    public boolean isRecurring() { return isRecurring; }
+    public void setRecurring(boolean isRecurring) { this.isRecurring = isRecurring; }
 
-    // Existing getters and setters
+    public String getRecurringPeriod() { return recurringPeriod; }
+    public void setRecurringPeriod(String recurringPeriod) { this.recurringPeriod = recurringPeriod; }
+
+    // Existing getters and setters for other fields
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
+    public int getUserId() { return userId; }
+    public void setUserId(int userId) { this.userId = userId; }
     public double getAmount() { return amount; }
     public void setAmount(double amount) { this.amount = amount; }
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
     public String getDate() { return date; }
     public void setDate(String date) { this.date = date; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    public String getColor() { return color; }
+    public void setColor(String color) { this.color = color; }
+    public String getCurrency() { return currency; }
+    public void setCurrency(String currency) { this.currency = currency; }
 }

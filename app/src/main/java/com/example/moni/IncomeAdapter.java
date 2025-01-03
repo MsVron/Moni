@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.switchmaterial.SwitchMaterial;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,11 +38,22 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeView
     @Override
     public void onBindViewHolder(@NonNull IncomeViewHolder holder, int position) {
         Income income = incomeList.get(position);
-        holder.tvType.setText(income.getType());
+
+        holder.tvType.setText(income.getCategory());
+        holder.tvSubcategory.setText(income.getSubcategory());
         holder.tvDate.setText(income.getDate());
         holder.tvDescription.setText(income.getDescription());
         holder.tvAmount.setText(income.getCurrency() + " " + String.format("%.2f", income.getAmount()));
 
+        // Handle recurring income visibility
+        if (income.isRecurring()) {
+            holder.tvRecurring.setVisibility(View.VISIBLE);
+            holder.tvRecurring.setText("Recurring: " + income.getRecurringPeriod());
+        } else {
+            holder.tvRecurring.setVisibility(View.GONE);
+        }
+
+        // Set color indicator if available
         if (income.getColor() != null) {
             holder.colorIndicator.setBackgroundColor(Color.parseColor(income.getColor()));
         }
@@ -52,15 +65,17 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeView
     }
 
     static class IncomeViewHolder extends RecyclerView.ViewHolder {
-        TextView tvType, tvDate, tvDescription, tvAmount;
+        TextView tvType, tvSubcategory, tvDate, tvDescription, tvAmount, tvRecurring;
         View colorIndicator;
 
         IncomeViewHolder(View view) {
             super(view);
             tvType = view.findViewById(R.id.tvType);
+            tvSubcategory = view.findViewById(R.id.tvSubcategory);
             tvDate = view.findViewById(R.id.tvDate);
             tvDescription = view.findViewById(R.id.tvDescription);
             tvAmount = view.findViewById(R.id.tvAmount);
+            tvRecurring = view.findViewById(R.id.tvRecurring);
             colorIndicator = view.findViewById(R.id.colorIndicator);
         }
     }
