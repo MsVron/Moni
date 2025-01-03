@@ -35,6 +35,15 @@ public enum IncomeCategory {
         return categoryName;
     }
 
+    public static String[] getCategoryNames() {
+        IncomeCategory[] categories = IncomeCategory.values();
+        String[] names = new String[categories.length];
+        for (int i = 0; i < categories.length; i++) {
+            names[i] = categories[i].getCategoryName();
+        }
+        return names;
+    }
+
     public String[] getSubcategories() {
         return subcategories;
     }

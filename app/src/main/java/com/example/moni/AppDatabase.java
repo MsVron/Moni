@@ -13,9 +13,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
         User.class,
         Income.class,
         Expense.class,
-        Offer.class,
-        SubscriptionPlan.class,
-        PremiumFeature.class
+        Offer.class
 }, version = 7, exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
@@ -25,8 +23,6 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract IncomeDao incomeDao();
     public abstract ExpenseDao expenseDao();
     public abstract OfferDao offerDao();
-    public abstract SubscriptionPlanDao subscriptionPlanDao();
-    public abstract PremiumFeatureDao premiumFeatureDao();
 
     public static synchronized AppDatabase getInstance(Context context) {
         if (instance == null) {
@@ -39,14 +35,15 @@ public abstract class AppDatabase extends RoomDatabase {
                             MIGRATION_1_2,
                             MIGRATION_2_3,
                             MIGRATION_3_4,
-                            MIGRATION_4_5,
-                            MIGRATION_5_6
+                            MIGRATION_6_7
                     )
                     .fallbackToDestructiveMigration()
                     .build();
         }
         return instance;
     }
+
+    // Migrations 1-2, 2-3, and 3-4 remain unchanged since they're for core functionality
 
     // Migration 1 to 2
     static final Migration MIGRATION_1_2 = new Migration(1, 2) {
@@ -93,33 +90,7 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
-    // Migration 4 to 5
-    static final Migration MIGRATION_4_5 = new Migration(4, 5) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS subscription_plans ("
-                    + "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
-                    + "title TEXT NOT NULL,"
-                    + "price REAL NOT NULL,"
-                    + "discountedPrice REAL,"
-                    + "description TEXT,"
-                    + "isDiscounted INTEGER NOT NULL DEFAULT 0,"
-                    + "isActive INTEGER NOT NULL DEFAULT 1)");
-        }
-    };
-
-    // Migration 5 to 6
-    static final Migration MIGRATION_5_6 = new Migration(5, 6) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS premium_features ("
-                    + "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
-                    + "name TEXT NOT NULL,"
-                    + "description TEXT,"
-                    + "isActive INTEGER NOT NULL DEFAULT 1)");
-        }
-    };
-
+    // Migration 6 to 7 (expense table update)
     static final Migration MIGRATION_6_7 = new Migration(6, 7) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
@@ -137,7 +108,7 @@ public abstract class AppDatabase extends RoomDatabase {
                     + "isRecurring INTEGER NOT NULL DEFAULT 0, "
                     + "recurringPeriod TEXT)");
 
-            // Copy data from old table to new table, using type as category
+            // Copy data from old table to new table
             database.execSQL(
                     "INSERT INTO expense_new (id, userId, amount, category, subcategory, date, description, color, currency) "
                             + "SELECT id, userId, amount, type, 'General', date, description, color, currency FROM expense"

@@ -91,19 +91,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, OffersActivity.class));
                 drawerLayout.closeDrawers();
                 return true;
-            } else if (id == R.id.nav_premium) {
-                startActivity(new Intent(this, SubscriptionActivity.class));
-                drawerLayout.closeDrawers();
-                return true;
             } else if (id == R.id.nav_settings) {
                 startActivity(new Intent(this, SettingsActivity.class));
                 drawerLayout.closeDrawers();
                 return true;
             } else if (id == R.id.nav_logout) {
-            showLogoutConfirmationDialog();
-            drawerLayout.closeDrawers();
-            return true;
-        }
+                showLogoutConfirmationDialog();
+                drawerLayout.closeDrawers();
+                return true;
+            }
             return false;
         });
     }
@@ -181,9 +177,6 @@ public class MainActivity extends AppCompatActivity {
         OfferDialog dialog = new OfferDialog(this, offers, new OfferDialog.OnOfferActionListener() {
             @Override
             public void onLearnMore(Offer offer) {
-                if (offer.getType().equals("SUBSCRIPTION")) {
-                    startActivity(new Intent(MainActivity.this, SubscriptionActivity.class));
-                }
                 sessionManager.markOfferAsSeen(offer.getId());
             }
 

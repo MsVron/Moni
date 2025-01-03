@@ -31,7 +31,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private DrawerLayout drawerLayout;
     private EditText etOfferTitle, etOfferDescription, etOfferEndDate;
-    private EditText etPlanTitle, etPlanPrice, etPlanDescription;
     private ImageView ivOfferImage;
     private Calendar endDateTime = Calendar.getInstance();
     private Uri selectedImageUri;
@@ -49,6 +48,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         setupListeners();
     }
 
+
     private void initializeViews() {
         drawerLayout = findViewById(R.id.drawerLayout);
 
@@ -57,11 +57,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
         etOfferDescription = findViewById(R.id.etOfferDescription);
         etOfferEndDate = findViewById(R.id.etOfferEndDate);
         ivOfferImage = findViewById(R.id.ivOfferImage);
-
-        // Subscription Plan Management
-        etPlanTitle = findViewById(R.id.etPlanTitle);
-        etPlanPrice = findViewById(R.id.etPlanPrice);
-        etPlanDescription = findViewById(R.id.etPlanDescription);
     }
 
     private void setupToolbarAndDrawer() {
@@ -80,12 +75,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 drawerLayout.closeDrawers();
             } else if (id == R.id.nav_view_offers) {
                 startActivity(new Intent(this, OffersActivity.class));
-            } else if (id == R.id.nav_view_subscriptions) {
-                startActivity(new Intent(this, SubscriptionActivity.class));
-            } else if (id == R.id.nav_manage_subscriptions) {
-                startActivity(new Intent(this, SubscriptionManagerActivity.class));
-                drawerLayout.closeDrawers();
-                return true;
             } else if (id == R.id.nav_admin_logout) {
                 sessionManager.logout();
                 startActivity(new Intent(this, LoginActivity.class));
@@ -112,9 +101,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
         // Save offer button
         findViewById(R.id.btnSaveOffer).setOnClickListener(v -> saveOffer());
-
-        // Save subscription plan button
-        findViewById(R.id.btnSavePlan).setOnClickListener(v -> savePlan());
     }
 
     private void showDateTimePicker() {
@@ -167,12 +153,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
         }
 
         Offer offer = new Offer(title, description, endTime);
-
-        // Store the persistable URI
         offer.setImageUrl(selectedImageUri.toString());
         offer.setActive(true);
 
-        // Add logging
         Log.d("AdminDashboard", "Saving offer: " +
                 "\nTitle: " + title +
                 "\nDescription: " + description +
@@ -185,42 +168,12 @@ public class AdminDashboardActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 clearOfferFields();
                 Toast.makeText(this, "Offer saved successfully", Toast.LENGTH_SHORT).show();
-                // Add logging after save
                 try {
                     List<Offer> offers = db.offerDao().getActiveOffers(System.currentTimeMillis());
                     Log.d("AdminDashboard", "Total active offers after save: " + offers.size());
                 } catch (Exception e) {
                     Log.e("AdminDashboard", "Error checking offers: " + e.getMessage());
                 }
-            });
-        }).start();
-    }
-
-    private void savePlan() {
-        String title = etPlanTitle.getText().toString();
-        String description = etPlanDescription.getText().toString();
-        String priceStr = etPlanPrice.getText().toString();
-
-        if (title.isEmpty() || description.isEmpty() || priceStr.isEmpty()) {
-            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        double price;
-        try {
-            price = Double.parseDouble(priceStr);
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "Please enter a valid price", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        SubscriptionPlan plan = new SubscriptionPlan(title, price, description);
-
-        new Thread(() -> {
-            db.subscriptionPlanDao().insert(plan);
-            runOnUiThread(() -> {
-                clearPlanFields();
-                Toast.makeText(this, "Subscription plan saved successfully", Toast.LENGTH_SHORT).show();
             });
         }).start();
     }
@@ -233,11 +186,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
         selectedImageUri = null;
     }
 
-    private void clearPlanFields() {
-        etPlanTitle.setText("");
-        etPlanPrice.setText("");
-        etPlanDescription.setText("");
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
