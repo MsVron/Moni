@@ -17,12 +17,15 @@ import java.util.Locale;
 
 public class AddExpenseActivity extends AppCompatActivity {
     private EditText etAmount, etDate, etDescription;
-    private AutoCompleteTextView spinnerType, spinnerCurrency;
+    private AutoCompleteTextView spinnerCategory, spinnerSubcategory, spinnerCurrency, spinnerRecurringPeriod;
+    private com.google.android.material.switchmaterial.SwitchMaterial switchRecurring;
+    private View layoutRecurringPeriod;
     private AppDatabase db;
     private Calendar calendar;
     private SessionManager sessionManager;
     private String selectedColor = "#FF4444";
     private View lastSelectedColorView;
+    private ExpenseCategory selectedCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,7 @@ public class AddExpenseActivity extends AppCompatActivity {
         setupSpinners();
         setupDatePicker();
         setupColorSelection();
+        setupRecurringExpense();
     }
 
     private void setupToolbar() {
@@ -53,28 +57,60 @@ public class AddExpenseActivity extends AppCompatActivity {
         etAmount = findViewById(R.id.etAmount);
         etDate = findViewById(R.id.etDate);
         etDescription = findViewById(R.id.etDescription);
-        spinnerType = findViewById(R.id.spinnerType);
+        spinnerCategory = findViewById(R.id.spinnerCategory);
+        spinnerSubcategory = findViewById(R.id.spinnerSubcategory);
         spinnerCurrency = findViewById(R.id.spinnerCurrency);
+        spinnerRecurringPeriod = findViewById(R.id.spinnerRecurringPeriod);
+        switchRecurring = findViewById(R.id.switchRecurring);
+        layoutRecurringPeriod = findViewById(R.id.layoutRecurringPeriod);
         MaterialButton btnSave = findViewById(R.id.btnSave);
         btnSave.setOnClickListener(v -> saveExpense());
     }
 
     private void setupSpinners() {
-        // Setup expense type spinner
-        String[] expenseTypes = {"Food", "Transport", "Shopping", "Bills", "Entertainment", "Other"};
-        ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_dropdown_item_1line, expenseTypes);
-        spinnerType.setAdapter(typeAdapter);
-
-        // Setup currency spinner with default selection
+        // Setup currency spinner
         String[] currencies = {"USD", "EUR", "GBP", "JPY"};
         ArrayAdapter<String> currencyAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, currencies);
         spinnerCurrency.setAdapter(currencyAdapter);
+        spinnerCurrency.setText(sessionManager.getDefaultCurrency(), false);
 
-        // Set default currency from settings
-        String defaultCurrency = sessionManager.getDefaultCurrency();
-        spinnerCurrency.setText(defaultCurrency, false);
+        // Setup category spinner
+        String[] categories = new String[ExpenseCategory.values().length];
+        for (int i = 0; i < ExpenseCategory.values().length; i++) {
+            categories[i] = ExpenseCategory.values()[i].getCategoryName();
+        }
+        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, categories);
+        spinnerCategory.setAdapter(categoryAdapter);
+
+        // Setup category selection listener
+        spinnerCategory.setOnItemClickListener((parent, view, position, id) -> {
+            selectedCategory = ExpenseCategory.values()[position];
+            updateSubcategories(selectedCategory);
+        });
+
+        // Setup recurring period spinner
+        String[] recurringPeriods = {"Daily", "Weekly", "Monthly", "Yearly"};
+        ArrayAdapter<String> periodAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, recurringPeriods);
+        spinnerRecurringPeriod.setAdapter(periodAdapter);
+    }
+
+    private void updateSubcategories(ExpenseCategory category) {
+        ArrayAdapter<String> subcategoryAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, category.getSubcategories());
+        spinnerSubcategory.setAdapter(subcategoryAdapter);
+        spinnerSubcategory.setText("", false);
+    }
+
+    private void setupRecurringExpense() {
+        switchRecurring.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            layoutRecurringPeriod.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            if (!isChecked) {
+                spinnerRecurringPeriod.setText("", false);
+            }
+        });
     }
 
     private void setupDatePicker() {
@@ -160,12 +196,15 @@ public class AddExpenseActivity extends AppCompatActivity {
     private void saveExpense() {
         try {
             String amountStr = etAmount.getText().toString();
-            String type = spinnerType.getText().toString();
+            String category = spinnerCategory.getText().toString();
+            String subcategory = spinnerSubcategory.getText().toString();
             String currency = spinnerCurrency.getText().toString();
             String date = etDate.getText().toString();
             String description = etDescription.getText().toString();
+            boolean isRecurring = switchRecurring.isChecked();
+            String recurringPeriod = isRecurring ? spinnerRecurringPeriod.getText().toString() : null;
 
-            if (amountStr.isEmpty() || type.isEmpty() || currency.isEmpty()) {
+            if (amountStr.isEmpty() || category.isEmpty() || subcategory.isEmpty() || currency.isEmpty()) {
                 Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -173,7 +212,18 @@ public class AddExpenseActivity extends AppCompatActivity {
             double amount = Double.parseDouble(amountStr);
             int userId = sessionManager.getUserId();
 
-            Expense expense = new Expense(userId, amount, type, date, description, selectedColor, currency);
+            Expense expense = new Expense(
+                    userId,
+                    amount,
+                    category,
+                    subcategory,
+                    date,
+                    description,
+                    selectedColor,
+                    currency,
+                    isRecurring,
+                    recurringPeriod
+            );
 
             new Thread(() -> {
                 db.expenseDao().insert(expense);

@@ -16,8 +16,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
         Offer.class,
         SubscriptionPlan.class,
         PremiumFeature.class
-}, version = 6, exportSchema = false)
-@TypeConverters({Converters.class})  // Add this line
+}, version = 7, exportSchema = false)
+@TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase instance;
 
@@ -117,6 +117,37 @@ public abstract class AppDatabase extends RoomDatabase {
                     + "name TEXT NOT NULL,"
                     + "description TEXT,"
                     + "isActive INTEGER NOT NULL DEFAULT 1)");
+        }
+    };
+
+    static final Migration MIGRATION_6_7 = new Migration(6, 7) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            // Create new table with updated schema
+            database.execSQL("CREATE TABLE IF NOT EXISTS expense_new ("
+                    + "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                    + "userId INTEGER NOT NULL, "
+                    + "amount REAL NOT NULL, "
+                    + "category TEXT NOT NULL, "
+                    + "subcategory TEXT NOT NULL, "
+                    + "date TEXT NOT NULL, "
+                    + "description TEXT, "
+                    + "color TEXT, "
+                    + "currency TEXT NOT NULL, "
+                    + "isRecurring INTEGER NOT NULL DEFAULT 0, "
+                    + "recurringPeriod TEXT)");
+
+            // Copy data from old table to new table, using type as category
+            database.execSQL(
+                    "INSERT INTO expense_new (id, userId, amount, category, subcategory, date, description, color, currency) "
+                            + "SELECT id, userId, amount, type, 'General', date, description, color, currency FROM expense"
+            );
+
+            // Drop the old table
+            database.execSQL("DROP TABLE expense");
+
+            // Rename new table
+            database.execSQL("ALTER TABLE expense_new RENAME TO expense");
         }
     };
 }
