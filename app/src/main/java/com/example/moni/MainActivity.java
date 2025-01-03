@@ -100,15 +100,26 @@ public class MainActivity extends AppCompatActivity {
                 drawerLayout.closeDrawers();
                 return true;
             } else if (id == R.id.nav_logout) {
-                sessionManager.logout();
-                startActivity(new Intent(this, LoginActivity.class));
-                finish();
-                return true;
-            }
+            showLogoutConfirmationDialog();
+            drawerLayout.closeDrawers();
+            return true;
+        }
             return false;
         });
     }
 
+    private void showLogoutConfirmationDialog() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Logout")
+                .setMessage("Are you sure you want to logout?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    sessionManager.logout();
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    finish();
+                })
+                .setNegativeButton("No", null)
+                .show();
+    }
     private void setupClickListeners() {
         cardIncome.setOnClickListener(v ->
                 startActivity(new Intent(this, AddIncomeActivity.class)));
@@ -183,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
         });
         dialog.show();
     }
+
 
 
     @Override
