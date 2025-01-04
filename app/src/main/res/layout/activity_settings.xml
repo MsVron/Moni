@@ -19,8 +19,13 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/background"
             app:titleTextColor="@color/text_primary"
-            app:titleTextAppearance="@style/TextAppearance.MaterialComponents.Headline6"/>
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:navigationIconTint="@color/primary"
+            android:elevation="0dp"
+            app:contentInsetStartWithNavigation="16dp"
+            app:titleTextAppearance="@style/ToolbarTitleStyle"/>
     </com.google.android.material.appbar.AppBarLayout>
+
 
     <ScrollView
         android:layout_width="match_parent"

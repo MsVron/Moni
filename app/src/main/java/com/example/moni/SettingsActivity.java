@@ -32,6 +32,23 @@ public class SettingsActivity extends AppCompatActivity {
         setupButtons();
     }
 
+    private void setupViews() {
+        // Setup toolbar with back arrow
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setTitle("Settings");
+        }
+
+        etNewName = findViewById(R.id.etNewName);
+        etCurrentPassword = findViewById(R.id.etCurrentPassword);
+        etNewPassword = findViewById(R.id.etNewPassword);
+
+        etNewName.setText(sessionManager.getUserName());
+    }
+
     private void setupCurrencySpinner() {
         AutoCompleteTextView spinnerDefaultCurrency = findViewById(R.id.spinnerDefaultCurrency);
         String[] currencies = {"USD", "EUR", "GBP", "JPY"};
@@ -53,17 +70,26 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
     }
-    private void setupViews() {
-        etNewName = findViewById(R.id.etNewName);
-        etCurrentPassword = findViewById(R.id.etCurrentPassword);
-        etNewPassword = findViewById(R.id.etNewPassword);
-
-        etNewName.setText(sessionManager.getUserName());
-    }
 
     private void setupButtons() {
         findViewById(R.id.btnSaveName).setOnClickListener(v -> updateName());
         findViewById(R.id.btnChangePassword).setOnClickListener(v -> updatePassword());
+
+        // Setup logout button if needed
+        MaterialButton btnLogout = findViewById(R.id.btnLogout);
+        btnLogout.setOnClickListener(v -> {
+            sessionManager.logout();
+            finish();
+        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void updateName() {

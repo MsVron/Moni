@@ -14,15 +14,15 @@ public interface ExpenseDao {
     void insert(Expense expense);
 
     // Retrieve all expenses for a user, ordered by date in descending order
-    @Query("SELECT * FROM expense WHERE userId = :userId ORDER BY date DESC")
+    @Query("SELECT * FROM expense WHERE userId = :userId ORDER BY strftime('%Y-%m-%d', date) DESC")
     List<Expense> getAllExpenses(int userId);
 
     // Calculate the total expense amount for a user
     @Query("SELECT SUM(amount) FROM expense WHERE userId = :userId")
     double getTotalExpense(int userId);
 
-    // Retrieve expenses by category for a user
-    @Query("SELECT * FROM expense WHERE userId = :userId AND category = :category")
+    // Retrieve expenses by category for a user, ordered by date in descending order
+    @Query("SELECT * FROM expense WHERE userId = :userId AND category = :category ORDER BY strftime('%Y-%m-%d', date) DESC")
     List<Expense> getExpensesByCategory(int userId, String category);
 
     // Retrieve the total expenses grouped by category for a user
