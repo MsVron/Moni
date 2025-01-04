@@ -25,6 +25,23 @@ public class AddIncomeActivity extends AppCompatActivity {
     private Calendar calendar;
     private String selectedColor = "#FF4444";
     private View lastSelectedColorView;
+    private int incomeId = -1;
+
+
+
+    private void populateFieldsForEditing() {
+        etAmount.setText(String.valueOf(getIntent().getDoubleExtra("AMOUNT", 0)));
+        spinnerCategory.setText(getIntent().getStringExtra("CATEGORY"), false);
+        spinnerSubcategory.setText(getIntent().getStringExtra("SUBCATEGORY"), false);
+        etDate.setText(getIntent().getStringExtra("DATE"));
+        etDescription.setText(getIntent().getStringExtra("DESCRIPTION"));
+        selectedColor = getIntent().getStringExtra("COLOR");
+        spinnerCurrency.setText(getIntent().getStringExtra("CURRENCY"), false);
+        switchRecurring.setChecked(getIntent().getBooleanExtra("IS_RECURRING", false));
+        if (switchRecurring.isChecked()) {
+            spinnerRecurringPeriod.setText(getIntent().getStringExtra("RECURRING_PERIOD"), false);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +56,12 @@ public class AddIncomeActivity extends AppCompatActivity {
         setupDatePicker();
         setupColorSelection();
         setupRecurringIncome();
+
+        // Check if we're editing an existing income
+        if (getIntent().hasExtra("INCOME_ID")) {
+            incomeId = getIntent().getIntExtra("INCOME_ID", -1);
+            populateFieldsForEditing();
+        }
     }
 
     private void initializeViews() {
@@ -228,10 +251,23 @@ public class AddIncomeActivity extends AppCompatActivity {
                     recurringPeriod
             );
 
+            // Check if this is an update scenario
+            if (incomeId != -1) {
+                income.setId(incomeId); // Ensure Income class has a setId method
+            }
+
             new Thread(() -> {
-                db.incomeDao().insert(income);
+                if (incomeId != -1) {
+                    // Update existing income
+                    db.incomeDao().update(income); // Ensure IncomeDao has an update method
+                } else {
+                    // Insert new income
+                    db.incomeDao().insert(income);
+                }
+
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "Income saved successfully", Toast.LENGTH_SHORT).show();
+                    String message = incomeId != -1 ? "Income updated successfully" : "Income saved successfully";
+                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
                     finish();
                 });
             }).start();
@@ -240,4 +276,5 @@ public class AddIncomeActivity extends AppCompatActivity {
             Toast.makeText(this, "Please enter a valid amount", Toast.LENGTH_SHORT).show();
         }
     }
+
 }

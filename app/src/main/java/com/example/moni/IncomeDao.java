@@ -1,8 +1,11 @@
 package com.example.moni;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
+
 import java.util.List;
 
 @Dao
@@ -25,4 +28,13 @@ public interface IncomeDao {
 
     @Query("SELECT * FROM income WHERE userId = :userId AND isRecurring = 1")
     List<Income> getRecurringIncome(int userId);
+
+    @Delete
+    void delete(Income income);
+
+    @Query("DELETE FROM income WHERE id = :incomeId")
+    void deleteById(long incomeId);
+
+    @Update
+    void update(Income income);
 }

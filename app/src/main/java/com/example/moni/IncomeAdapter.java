@@ -5,10 +5,10 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +16,11 @@ import java.util.List;
 public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeViewHolder> {
     private List<Income> incomeList;
     private Context context;
+    private OnIncomeClickListener listener;  // Added listener
 
-    public IncomeAdapter(Context context) {
+    public IncomeAdapter(Context context, OnIncomeClickListener listener) {  // Updated constructor
         this.context = context;
+        this.listener = listener;
         this.incomeList = new ArrayList<>();
     }
 
@@ -57,6 +59,19 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeView
         if (income.getColor() != null) {
             holder.colorIndicator.setBackgroundColor(Color.parseColor(income.getColor()));
         }
+
+        // Set listeners for edit and delete buttons
+        holder.btnEdit.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onEditClick(income);
+            }
+        });
+
+        holder.btnDelete.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onDeleteClick(income);
+            }
+        });
     }
 
     @Override
@@ -67,6 +82,7 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeView
     static class IncomeViewHolder extends RecyclerView.ViewHolder {
         TextView tvType, tvSubcategory, tvDate, tvDescription, tvAmount, tvRecurring;
         View colorIndicator;
+        ImageButton btnEdit, btnDelete;
 
         IncomeViewHolder(View view) {
             super(view);
@@ -77,6 +93,13 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeView
             tvAmount = view.findViewById(R.id.tvAmount);
             tvRecurring = view.findViewById(R.id.tvRecurring);
             colorIndicator = view.findViewById(R.id.colorIndicator);
+            btnEdit = view.findViewById(R.id.btnEdit);  // Bind edit button
+            btnDelete = view.findViewById(R.id.btnDelete);  // Bind delete button
         }
+    }
+
+    public interface OnIncomeClickListener {  // Listener interface
+        void onEditClick(Income income);
+        void onDeleteClick(Income income);
     }
 }

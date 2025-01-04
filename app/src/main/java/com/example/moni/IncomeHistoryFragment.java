@@ -1,11 +1,14 @@
 package com.example.moni;
 
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -14,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IncomeHistoryFragment extends Fragment {
+public class IncomeHistoryFragment extends Fragment implements IncomeAdapter.OnIncomeClickListener {
     private AppDatabase db;
     private SessionManager sessionManager;
     private IncomeAdapter adapter;
@@ -23,16 +26,14 @@ public class IncomeHistoryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_income_history, container, false);
-
         db = AppDatabase.getInstance(requireContext());
         sessionManager = new SessionManager(requireContext());
-
         setupCategoryFilter(view);
         setupRecyclerView(view);
         loadIncomeHistory(null); // null means all categories
-
         return view;
     }
+
 
     private void setupCategoryFilter(View view) {
         categoryFilter = view.findViewById(R.id.categoryFilterSpinner);
@@ -59,7 +60,7 @@ public class IncomeHistoryFragment extends Fragment {
     private void setupRecyclerView(View view) {
         RecyclerView recyclerView = view.findViewById(R.id.rvIncome);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        adapter = new IncomeAdapter(requireContext());
+        adapter = new IncomeAdapter(requireContext(), this); // Update this line to pass the listener
         recyclerView.setAdapter(adapter);
     }
 
@@ -83,5 +84,47 @@ public class IncomeHistoryFragment extends Fragment {
         super.onResume();
         loadIncomeHistory(categoryFilter.getText().toString().equals("All Categories") ?
                 null : categoryFilter.getText().toString());
+    }
+
+    @Override
+    public void onEditClick(Income income) {
+        // Handle edit action
+        Intent intent = new Intent(requireContext(), AddIncomeActivity.class);
+        // Add income details to intent
+        intent.putExtra("INCOME_ID", income.getId());
+        intent.putExtra("AMOUNT", income.getAmount());
+        intent.putExtra("CATEGORY", income.getCategory());
+        intent.putExtra("SUBCATEGORY", income.getSubcategory());
+        intent.putExtra("DATE", income.getDate());
+        intent.putExtra("DESCRIPTION", income.getDescription());
+        intent.putExtra("COLOR", income.getColor());
+        intent.putExtra("CURRENCY", income.getCurrency());
+        intent.putExtra("IS_RECURRING", income.isRecurring());
+        intent.putExtra("RECURRING_PERIOD", income.getRecurringPeriod());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onDeleteClick(Income income) {
+        // Show confirmation dialog before deleting
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Delete Income")
+                .setMessage("Are you sure you want to delete this income entry?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    // Delete the income entry
+                    new Thread(() -> {
+                        db.incomeDao().delete(income);
+                        // Reload the income history on the main thread
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                Toast.makeText(requireContext(), "Income deleted successfully", Toast.LENGTH_SHORT).show();
+                                loadIncomeHistory(categoryFilter.getText().toString().equals("All Categories") ?
+                                        null : categoryFilter.getText().toString());
+                            });
+                        }
+                    }).start();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 }
