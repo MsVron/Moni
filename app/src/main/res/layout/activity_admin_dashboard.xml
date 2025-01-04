@@ -12,37 +12,53 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/primary"/>
+            android:layout_height="wrap_content"
+            android:background="@color/background"
+            android:elevation="0dp">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/background"
+                app:titleTextColor="@color/text_primary"
+                app:titleTextAppearance="@style/TextAppearance.MaterialComponents.Headline6"/>
+        </com.google.android.material.appbar.AppBarLayout>
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:scrollbars="none">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="20dp">
 
                 <!-- Offer Management Section -->
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Manage Offers"
-                    android:textSize="24sp"
+                    android:textSize="22sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="16dp"/>
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="12dp"
+                    android:layout_marginStart="4dp"/>
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="24dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp">
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="1dp"
+                    app:strokeColor="@color/border_color"
+                    app:strokeWidth="1dp"
+                    app:cardBackgroundColor="@color/card_background">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -50,55 +66,89 @@
                         android:orientation="vertical"
                         android:padding="16dp">
 
-                        <ImageView
-                            android:id="@+id/ivOfferImage"
+                        <com.google.android.material.card.MaterialCardView
                             android:layout_width="match_parent"
                             android:layout_height="200dp"
-                            android:scaleType="centerCrop"
-                            android:background="#DDDDDD"
-                            android:src="@android:drawable/ic_menu_camera"/>
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp"
+                            app:strokeColor="@color/border_color"
+                            app:strokeWidth="1dp">
+
+                            <ImageView
+                                android:id="@+id/ivOfferImage"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="centerCrop"
+                                android:background="@color/light_gray"
+                                android:src="@android:drawable/ic_menu_camera"/>
+
+                        </com.google.android.material.card.MaterialCardView>
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                            android:layout_marginTop="20dp"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            app:boxCornerRadiusBottomEnd="12dp"
+                            app:boxCornerRadiusBottomStart="12dp"
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusTopStart="12dp"
+                            app:boxStrokeColor="@color/primary">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etOfferTitle"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Offer Title"/>
+                                android:hint="Offer Title"
+                                android:padding="16dp"
+                                android:textColor="@color/text_primary"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                            android:layout_marginTop="16dp"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            app:boxCornerRadiusBottomEnd="12dp"
+                            app:boxCornerRadiusBottomStart="12dp"
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusTopStart="12dp"
+                            app:boxStrokeColor="@color/primary">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etOfferDescription"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="Offer Description"
+                                android:padding="16dp"
                                 android:inputType="textMultiLine"
-                                android:minLines="3"/>
+                                android:minLines="3"
+                                android:gravity="top"
+                                android:textColor="@color/text_primary"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                            android:layout_marginTop="16dp"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            app:boxCornerRadiusBottomEnd="12dp"
+                            app:boxCornerRadiusBottomStart="12dp"
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusTopStart="12dp"
+                            app:boxStrokeColor="@color/primary"
+                            app:endIconDrawable="@android:drawable/ic_menu_my_calendar"
+                            app:endIconMode="custom">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etOfferEndDate"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="End Date &amp; Time"
+                                android:padding="16dp"
                                 android:focusable="false"
-                                android:clickable="true"/>
+                                android:clickable="true"
+                                android:textColor="@color/text_primary"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.button.MaterialButton
@@ -106,19 +156,26 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Save Offer"
-                            android:layout_marginTop="16dp"/>
+                            android:textAllCaps="false"
+                            android:padding="16dp"
+                            android:layout_marginTop="24dp"
+                            app:cornerRadius="12dp"
+                            android:backgroundTint="@color/primary"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
 
-    <!-- Navigation Drawer -->
+    <!-- Navigation Drawer with updated styling -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:background="@color/card_background"
+        app:itemTextColor="@color/text_primary"
+        app:itemIconTint="@color/primary"
         app:menu="@menu/admin_drawer_menu"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>
