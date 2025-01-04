@@ -13,6 +13,16 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Delete button -->
+        <ImageView
+            android:id="@+id/ivDelete"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_menu_delete"
+            android:visibility="gone"
+            android:layout_gravity="end"
+            android:layout_margin="8dp" />
+
         <ImageView
             android:id="@+id/ivOfferImage"
             android:layout_width="match_parent"

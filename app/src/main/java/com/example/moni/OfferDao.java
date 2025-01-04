@@ -16,4 +16,7 @@ public interface OfferDao {
 
     @Update
     void update(Offer offer);
+
+    @Query("DELETE FROM offers WHERE id = :offerId")
+    void deleteOffer(int offerId);
 }

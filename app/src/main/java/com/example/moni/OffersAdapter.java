@@ -14,18 +14,21 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class OffersAdapter extends RecyclerView.Adapter<OffersAdapter.OfferViewHolder> {
+    private boolean isAdmin;
     private List<Offer> offers;
     private Context context;
     private OnOfferClickListener listener;
 
     public interface OnOfferClickListener {
         void onOfferClick(Offer offer);
+        void onDeleteClick(Offer offer);
     }
 
-    public OffersAdapter(Context context, OnOfferClickListener listener) {
+    public OffersAdapter(Context context, OnOfferClickListener listener, boolean isAdmin) {
         this.context = context;
         this.listener = listener;
         this.offers = new ArrayList<>();
+        this.isAdmin = isAdmin;
     }
 
     public void setOffers(List<Offer> offers) {
@@ -76,6 +79,17 @@ public class OffersAdapter extends RecyclerView.Adapter<OffersAdapter.OfferViewH
                 listener.onOfferClick(offer);
             }
         });
+
+        if (isAdmin) {
+            holder.ivDelete.setVisibility(View.VISIBLE);
+            holder.ivDelete.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onDeleteClick(offer);
+                }
+            });
+        } else {
+            holder.ivDelete.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -84,12 +98,13 @@ public class OffersAdapter extends RecyclerView.Adapter<OffersAdapter.OfferViewH
     }
 
     static class OfferViewHolder extends RecyclerView.ViewHolder {
-        ImageView ivOfferImage;
+        ImageView ivOfferImage, ivDelete;  // Add ivDelete
         TextView tvTitle, tvDescription, tvTimeRemaining;
 
         OfferViewHolder(View view) {
             super(view);
             ivOfferImage = view.findViewById(R.id.ivOfferImage);
+            ivDelete = view.findViewById(R.id.ivDelete);
             tvTitle = view.findViewById(R.id.tvTitle);
             tvDescription = view.findViewById(R.id.tvDescription);
             tvTimeRemaining = view.findViewById(R.id.tvTimeRemaining);

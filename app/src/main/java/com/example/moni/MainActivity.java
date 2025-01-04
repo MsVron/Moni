@@ -13,6 +13,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
     private SessionManager sessionManager;
@@ -162,8 +163,13 @@ public class MainActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 List<Offer> activeOffers = db.offerDao().getActiveOffers(System.currentTimeMillis());
-                if (!activeOffers.isEmpty()) {
-                    runOnUiThread(() -> showOfferDialog(activeOffers));
+                // Filter out offers that have been seen
+                List<Offer> unseenOffers = activeOffers.stream()
+                        .filter(offer -> !sessionManager.hasSeenOffer(offer.getId()))
+                        .collect(Collectors.toList());
+
+                if (!unseenOffers.isEmpty()) {
+                    runOnUiThread(() -> showOfferDialog(unseenOffers));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -195,13 +201,19 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         updateBalance();
         updateWelcomeAndBalance();
-        checkForActiveOffers(); // Call this method to check for active offers
+
+        // Check if we should reset offers due to time period
+        if (sessionManager.shouldResetOffers()) {
+            sessionManager.clearSeenOffers();
+        }
+
+        // Now check for active offers
+        checkForActiveOffers();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        sessionManager.clearSeenOffers(); // Clear seen offers when the activity is paused
     }
 
     @Override

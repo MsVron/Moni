@@ -14,11 +14,19 @@ public class SessionManager {
     private static final String KEY_USER_ID = "userId";
     private static final String KEY_DEFAULT_CURRENCY = "defaultCurrency";
     private static final String PREF_SEEN_OFFERS = "seenOffers";
-    private static final String KEY_IS_ADMIN = "isAdmin";  // Added this line
+    private static final String KEY_IS_ADMIN = "isAdmin";
+    private static final String KEY_LAST_OFFERS_RESET = "lastOffersReset";
+    private static final long OFFERS_RESET_PERIOD = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
     public SessionManager(Context context) {
         pref = context.getApplicationContext().getSharedPreferences("MoniSession", Context.MODE_PRIVATE);
         editor = pref.edit();
+    }
+
+    public boolean shouldResetOffers() {
+        long lastReset = pref.getLong(KEY_LAST_OFFERS_RESET, 0);
+        long currentTime = System.currentTimeMillis();
+        return (currentTime - lastReset) >= OFFERS_RESET_PERIOD;
     }
 
     public void setLogin(boolean isLoggedIn, String userEmail, String userName, int userId) {
@@ -76,17 +84,18 @@ public class SessionManager {
     }
 
     public void logout() {
-        // Preserve the default currency and seen offers during logout
+        // Preserve the default currency during logout
         String defaultCurrency = getDefaultCurrency();
-        Set<String> seenOffers = pref.getStringSet(PREF_SEEN_OFFERS, new HashSet<>());
         editor.clear();
         editor.putString(KEY_DEFAULT_CURRENCY, defaultCurrency);
-        editor.putStringSet(PREF_SEEN_OFFERS, seenOffers);
+        // Clear seen offers on logout
+        clearSeenOffers();
         editor.commit();
     }
 
     public void clearSeenOffers() {
         editor.remove(PREF_SEEN_OFFERS);
+        editor.putLong(KEY_LAST_OFFERS_RESET, System.currentTimeMillis());
         editor.commit();
     }
 

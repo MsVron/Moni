@@ -42,7 +42,7 @@ public class OffersActivity extends AppCompatActivity implements OffersAdapter.O
     private void setupRecyclerView() {
         recyclerView = findViewById(R.id.rvOffers);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new OffersAdapter(this, this);
+        adapter = new OffersAdapter(this, this, sessionManager.isAdmin());  // Pass isAdmin
         recyclerView.setAdapter(adapter);
     }
 
@@ -96,6 +96,36 @@ public class OffersActivity extends AppCompatActivity implements OffersAdapter.O
             }
         });
         dialog.show();
+    }
+
+    @Override
+    public void onDeleteClick(Offer offer) {
+        // Show confirmation dialog
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Delete Offer")
+                .setMessage("Are you sure you want to delete this offer?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    deleteOffer(offer);
+                })
+                .setNegativeButton("No", null)
+                .show();
+    }
+
+    private void deleteOffer(Offer offer) {
+        new Thread(() -> {
+            try {
+                db.offerDao().deleteOffer(offer.getId());
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Offer deleted successfully", Toast.LENGTH_SHORT).show();
+                    loadOffers();  // Reload the offers list
+                });
+            } catch (Exception e) {
+                Log.e("OffersActivity", "Error deleting offer: " + e.getMessage());
+                runOnUiThread(() ->
+                        Toast.makeText(this, "Error deleting offer", Toast.LENGTH_SHORT).show()
+                );
+            }
+        }).start();
     }
 
     @Override
